@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# SEE: https://unix.stackexchange.com/questions/368123/how-to-extract-the-root-ca-and-subordinate-ca-from-a-certificate-chain-in-linux
+
+HOST=$1
+
+TMP_DIR=$(mktemp -d)
+
+openssl s_client -connect $HOST:443 -showcerts </dev/null 2>/dev/null \
+  | awk '/BEGIN/,/END/{ if(/BEGIN/){a++}; out="'$TMP_DIR'/cert"a".pem"; print >out}'
+
+for i in $TMP_DIR/cert*.pem
+do
+  echo
+  echo "-----------------------------------------------------------------------"
+  cat $i | openssl x509 -text -noout
+done
+
+rm -rf $TMP_DIR
