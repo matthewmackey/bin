@@ -69,6 +69,10 @@ set_font() {
     printf "ERROR: you must provide a <font_size>\n\n"
     usage
     exit 1
+  elif [[ ! "$_size" =~ ^[0-9.]+$ ]]; then
+    printf "ERROR: Font size must be a number (int or float)\n\n"
+    usage
+    exit 1
   fi
 
   verify_font_name "$_name"
