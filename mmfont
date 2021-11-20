@@ -56,7 +56,6 @@ verify_font_name() {
   fi
 }
 
-
 set_font() {
   local _name=$1
   local _size=$2
@@ -85,6 +84,19 @@ set_font() {
     "$gvariant_font_str"
 }
 
+set_size() {
+  local _size=$1
+  CURRENT_FONT=$(get_current_font)
+  set_font "$CURRENT_FONT" "$_size"
+}
+
+get_current_font() {
+  dconf read /org/gnome/terminal/legacy/profiles:/:$DEFAULT_PROFILE_ID/font \
+    | tr -d "'" \
+    | sed -r 's/(.*) [0-9.]+$/\1/'
+}
+
+
 CMD=$1
 case "$CMD" in
 
@@ -103,9 +115,11 @@ case "$CMD" in
     set_font "$2" "$3"
     ;;
 
+  "size")
+    set_size "$2"
+    ;;
+
   *)
     usage
     ;;
 esac
-# dconf write /org/gnome/terminal/legacy/profiles:/:$PROFILE_ID/font"
-
