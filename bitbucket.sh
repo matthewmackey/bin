@@ -27,8 +27,9 @@ create_repo() {
 
   URL="https://api.bitbucket.org/2.0/repositories/$BB_USER_WORKSPACE/$REPO_NAME"
 
-  set -x
-  curl -X POST \
+  RESP=$(curl -X POST \
+    "$URL" \
+    -s \
     -u "$BB_USER:$BB_APP_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{
@@ -37,10 +38,28 @@ create_repo() {
         "project": {
             "key": "'$PROJECT_KEY'"
         }
-      }' \
-    "$URL"
-  echo $?
-  set +x
+      }' 2>/dev/null
+    )
+    if echo $RESP | grep -q '"type": "error"'; then
+      printf "[ERROR]\n\n"
+      printf "$RESP"
+      return 1
+    else
+      SSH_CLONE_URL=$(echo "$RESP" | jq -r '.links.clone | .[] | select(.name == "ssh").href')
+      CLONE_CMD="git clone $SSH_CLONE_URL"
+      ADD_REMOTE_CMD="git remote add origin $SSH_CLONE_URL"
+      printf "Repo created"
+      printf "Clone the repo with:\n"
+      printf "  $CLONE_CMD\n\n"
+
+      printf "Add as remote with:\n"
+      printf "  $ADD_REMOTE_CMD\n\n"
+
+      if which xclip >&/dev/null; then
+        printf "Add remote command sent to clipboard\n"
+        printf "$ADD_REMOTE_CMD" | xclip -sel clip
+      fi
+    fi
 }
 
 list_repos() {
