@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set -e
+set -o pipefail
+
 #CONFIG_IN=~/.cinnamon/configs/pomodoro@gregfreeman.org/pomodoro@gregfreeman.org.json.orig
 CONFIG_IN=~/.cinnamon/configs/pomodoro@gregfreeman.org/pomodoro@gregfreeman.org.json
 CONFIG_OUT=~/.cinnamon/configs/pomodoro@gregfreeman.org/pomodoro@gregfreeman.org.json
