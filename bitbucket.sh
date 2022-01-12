@@ -10,7 +10,7 @@ $0 <option>
 
 OPTIONS
 
-  -c - Create repo (<repo_name> <project_key>)
+  -c - Create repo (<project_key> <repo_name>)
   -l - List repos
 EOF
   exit 1
@@ -22,8 +22,8 @@ create_repo() {
   PROJECT_KEY=$1
   REPO_NAME=$2
 
-  test -n "$REPO_NAME" || usage
   test -n "$PROJECT_KEY" || usage
+  test -n "$REPO_NAME" || usage
 
   URL="https://api.bitbucket.org/2.0/repositories/$BB_USER_WORKSPACE/$REPO_NAME"
 
@@ -39,6 +39,7 @@ create_repo() {
         }
       }' \
     "$URL"
+  echo $?
   set +x
 }
 
