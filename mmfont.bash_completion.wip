@@ -1,0 +1,36 @@
+#!/bin/bash
+
+_mmfont_completions() {
+
+  MAIN_CMDS="list show set size"
+
+  DEBUG=y
+
+  COMPREPLY=()
+
+  cur=${COMP_WORDS[$COMP_CWORD]}
+  prev=${COMP_WORDS[$COMP_CWORD-1]}
+  prev2=${COMP_WORDS[$COMP_CWORD-2]}
+  prev3=${COMP_WORDS[$COMP_CWORD-3]}
+
+  if [ "$DEBUG" = "y" ]; then
+    echo "[0=$0]"
+    echo "[1=$1]"
+    echo "[2=$2]"
+    echo "[3=$3]"
+    echo "COMP_WORDS=${COMP_WORDS[*]}"
+    echo "COMP_CWORD=${COMP_CWORD}"
+    echo "[curr=$curr]"
+    echo "[prev=$prev]"
+    echo "[prev2=$prev2]"
+    echo "[prev3=$prev3]"
+  fi
+
+  if [ $COMP_CWORD -eq 1 ]; then
+    COMPREPLY=( $(compgen -W "${MAIN_CMDS}") )
+  elif [ $COMP_CWORD -eq 2 ]; then
+    COMPREPLY=( $(compgen -F mmfont_list) )
+  fi
+}
+
+complete -F _mmfont_completions mmfont
