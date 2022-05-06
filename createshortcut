@@ -6,9 +6,17 @@ if [ -z $NAME ]; then
   exit 1
 fi
 
-SHORTCUT=~/dotfiles/desktop/.local/share/applications/$NAME.desktop
+# This script is used for shortcuts that ONLY are specific to this machine and
+# thus are copied to the local PROFILE
+SHORTCUT=$PROFILE/desktop/$NAME.desktop
+
+if [ "$(find ~/Desktop -type f -name 'chrome-*.desktop' | wc -l)" != "1" ]; then
+  printf "There are too many/few shortcuts in ~/Desktop\n\n"
+  ls -l ~/Desktop/chrome-*.desktop
+  exit 1
+fi
 
 echo "Creating shortcut at -> [$SHORTCUT]"
 mv ~/Desktop/chrome*.desktop $SHORTCUT
-#cd ~/dotfiles
-#stow destkop
+printf "\n"
+ls -l $PROFILE/desktop/*.desktop
