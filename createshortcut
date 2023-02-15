@@ -1,7 +1,5 @@
 #!/bin/bash
 
-LOCAL_DESKTOP_DIR=~/.local/share/applications
-
 usage() {
   cat <<EOF
 
@@ -34,12 +32,13 @@ if [ -z $NAME ]; then
   exit 1
 fi
 
+LOCAL_DESKTOP_DIR=~/.local/share/applications
 DEST_SHORTCUT=$LOCAL_DESKTOP_DIR/$NAME.desktop
 
-NUM_DESKTOP_FILES="$(find ~/Desktop -type f -name 'chrome-*.desktop' | wc -l)"
+num_desktop_files="$(find ~/Desktop -type f -name 'chrome-*.desktop' | wc -l)"
 
-if [ "$NUM_DESKTOP_FILES" != "1" ]; then
-  printf "There are too many/few shortcuts in ~/Desktop (found: $NUM_DESKTOP_FILES)\n\n"
+if [ "$num_desktop_files" != "1" ]; then
+  printf "There are too many/few shortcuts in ~/Desktop (found: $num_desktop_files)\n\n"
 
   for i in $(find ~/Desktop -type f -name 'chrome-*.desktop'); do
     printf "[$i]\n"
@@ -49,7 +48,18 @@ if [ "$NUM_DESKTOP_FILES" != "1" ]; then
   exit 1
 fi
 
-mv ~/Desktop/chrome*.desktop $DEST_SHORTCUT
-ls -l $LOCAL_DESKTOP_DIR/*.desktop
+src_desktop_file="$(find ~/Desktop -type f -name 'chrome-*.desktop')"
+
+# Chrome for whatever reason will (always ??) put a *.desktop file both in ~/Desktop AND ~/.local/share/applications
+duplicate_desktop_file=$LOCAL_DESKTOP_DIR/$(basename $src_desktop_file)
+if [ -f $duplicate_desktop_file ]; then
+  rm $duplicate_desktop_file
+  printf "Removed duplicate .desktop file put by Chrome at: [$duplicate_desktop_file]\n"
+fi
+
+# ls -l $LOCAL_DESKTOP_DIR/*.desktop
+
+mv $src_desktop_file $DEST_SHORTCUT
+chmod +x $DEST_SHORTCUT
 printf "\n"
-printf "Created shortcut at -> [$DEST_SHORTCUT]\n"
+printf "Moved [$src_desktop_file] to [$DEST_SHORTCUT]"
