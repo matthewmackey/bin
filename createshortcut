@@ -1,22 +1,55 @@
-#!/bin/sh
+#!/bin/bash
+
+LOCAL_DESKTOP_DIR=~/.local/share/applications
+
+usage() {
+  cat <<EOF
+
+NAME
+
+  $(basename $0) - copy .desktop file from Desktop to local .desktop directory
+
+SYNOPSIS
+
+  $(basename $0) <name>
+
+  This script will copy a lone chrome-*.desktop file from ~/Desktop to the user's
+  .desktop file directory ($LOCAL_DESKTOP_DIR).  It will name the final file with the name you provide.
+
+  This script is used for shortcuts that ONLY are specific to this machine and
+  thus are copied to $LOCAL_DESKTOP_DIR.
+
+DESCRIPTION
+
+  name - name to precede .desktop in destination shortcut filename (ie - <name>.desktop)
+
+EOF
+
+}
 
 NAME=$1
 if [ -z $NAME ]; then
-  echo "ERROR: you must provide a name for the shortcut -> \$NAME.desktop"
+  echo -e "ERROR: you must provde <NAME>\n"
+  usage
   exit 1
 fi
 
-# This script is used for shortcuts that ONLY are specific to this machine and
-# thus are copied to the local PROFILE
-SHORTCUT=$PROFILE/desktop/$NAME.desktop
+DEST_SHORTCUT=$LOCAL_DESKTOP_DIR/$NAME.desktop
 
-if [ "$(find ~/Desktop -type f -name 'chrome-*.desktop' | wc -l)" != "1" ]; then
-  printf "There are too many/few shortcuts in ~/Desktop\n\n"
-  ls -l ~/Desktop/chrome-*.desktop
+NUM_DESKTOP_FILES="$(find ~/Desktop -type f -name 'chrome-*.desktop' | wc -l)"
+
+if [ "$NUM_DESKTOP_FILES" != "1" ]; then
+  printf "There are too many/few shortcuts in ~/Desktop (found: $NUM_DESKTOP_FILES)\n\n"
+
+  for i in $(find ~/Desktop -type f -name 'chrome-*.desktop'); do
+    printf "[$i]\n"
+    grep --color 'Name' $i
+    printf "\n"
+  done
   exit 1
 fi
 
-echo "Creating shortcut at -> [$SHORTCUT]"
-mv ~/Desktop/chrome*.desktop $SHORTCUT
+mv ~/Desktop/chrome*.desktop $DEST_SHORTCUT
+ls -l $LOCAL_DESKTOP_DIR/*.desktop
 printf "\n"
-ls -l $PROFILE/desktop/*.desktop
+printf "Created shortcut at -> [$DEST_SHORTCUT]\n"
