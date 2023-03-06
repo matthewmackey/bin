@@ -32,9 +32,16 @@ bus = SessionBus()
 def get_pomodoro_proxy():
     return bus.get("org.gnome.Pomodoro", "/org/gnome/Pomodoro")
 
-def format_state(state: str):
-    if state == 'pomodoro':
-        return 'In Session (or ready to start)'
+def format_state(pomodoro):
+    state = pomodoro.State
+    # 'null' is a Gnome Shell Pomodoro DBus value which is why it is not None
+    if state == 'null':
+        return 'Stopped'
+    elif state == 'pomodoro':
+        if pomodoro.IsPaused:
+            return 'Paused'
+        else:
+            return 'Running'
     else:
         return ' '.join([s.capitalize() for s in state.split('-')])
 
@@ -64,7 +71,7 @@ def main():
         pomodoro.Start()
 
     elif cmd == 'status':
-        state = format_state(pomodoro.State)
+        state = format_state(pomodoro)
         duration_secs = pomodoro.StateDuration
         elapsed_secs = pomodoro.Elapsed
         time_left_secs = duration_secs - elapsed_secs
