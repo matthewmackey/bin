@@ -32,6 +32,12 @@ bus = SessionBus()
 def get_pomodoro_proxy():
     return bus.get("org.gnome.Pomodoro", "/org/gnome/Pomodoro")
 
+def format_state(state: str):
+    if state == 'pomodoro':
+        return 'In Session (or ready to start)'
+    else:
+        return ' '.join([s.capitalize() for s in state.split('-')])
+
 def main():
     pomodoro = get_pomodoro_proxy()
 
@@ -58,6 +64,7 @@ def main():
         pomodoro.Start()
 
     elif cmd == 'status':
+        state = format_state(pomodoro.State)
         duration_secs = pomodoro.StateDuration
         elapsed_secs = pomodoro.Elapsed
         time_left_secs = duration_secs - elapsed_secs
@@ -66,6 +73,8 @@ def main():
         time_left_pretty = str(datetime.timedelta(seconds=time_left_secs)).partition('.')
         elapsed_pretty = str(datetime.timedelta(seconds=elapsed_secs)).partition('.')
 
+        print("State:           %s" % state)
+        print()
         print("Time Left:       %s" % time_left_pretty[0])
         print("Pomo Duration:   %s" % duration_pretty[0])
         # print("Elapsed:     %s" % elapsed_pretty[0])
